@@ -1,5 +1,5 @@
 import requests
-import time
+from time import sleep
 from dotenv import load_dotenv
 import os
 import terminaltables
@@ -49,7 +49,7 @@ def predict_rub_salary_hh(programming_languages):
         except:
             break
         for page in range(pages):
-            time.sleep(1)
+            sleep(1)
             response = requests.get(url, params={'page': page, 'text': f'Программист {programming_language}'})
             response.raise_for_status()
             json_response = response.json()
