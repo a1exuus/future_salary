@@ -55,7 +55,7 @@ def predict_rub_salary_hh(programming_languages):
             if page >= api_response_content['pages']:
                 break
         avg_vacancy_salary[programming_language] = {
-                'average_salary': int(sum(middle_salaries) / len(middle_salaries)),
+                'average_salary': int(sum(middle_salaries) / len(middle_salaries)) if middle_salaries else 0,
                 'vacancies_found': api_response_content['found'],
                 'vacancies_processed': len(middle_salaries)
             }
