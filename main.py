@@ -66,19 +66,13 @@ def predict_rub_salary_sj(token, programming_languages):
     avg_vacancy_salary = {}
 
     for programming_language in programming_languages:
-        avg_vacancy_salary[programming_language] = {}
-
         superjob_url = 'https://api.superjob.ru/2.0/vacancies'
-        headers = {
-            'X-Api-App-Id': token
-        }
-
+        headers = {'X-Api-App-Id': token}
         params = {
             'keyword': f'Программист {programming_language}',
             'town': DEFAULT_CITY,
             'count': 100
         }
-
         vacancies_sj = []
 
         for page in count(0):
@@ -94,37 +88,25 @@ def predict_rub_salary_sj(token, programming_languages):
                 else:
                     raise ex
 
-            response_objects = response.get('objects', [])
-            vacancies_sj.extend(response_objects)
-
+            vacancies_sj.extend(response.get('objects', []))
             if not response.get('more'):
                 break
 
-        middle_salaries = []
-        for vacancy in vacancies_sj:
-            if not vacancy:
-                continue
-            middle_salary = int(predict_salary_sj(vacancy['payment_from'], vacancy['payment_to']))
-            if middle_salary:
-                middle_salaries.append(middle_salary)
-                
-        if middle_salaries:
-            try:
-                avg_salary = int(sum(middle_salaries) / len(middle_salaries))
-            except ZeroDivisionError:
-                avg_salary = None
+        middle_salaries = [
+            int(predict_salary_sj(vacancy['payment_from'], vacancy['payment_to']))
+            for vacancy in vacancies_sj
+            if vacancy and predict_salary_sj(vacancy['payment_from'], vacancy['payment_to'])
+        ]
 
-            avg_vacancy_salary[programming_language] = {
-                'average_salary': avg_salary,
-                'vacancies_found': len(vacancies_sj),
-                'vacancies_processed': len(middle_salaries),
-            }
-        else:
-            avg_vacancy_salary[programming_language] = {
-                'vacancies_found': len(vacancies_sj)
-            }
+        avg_salary = int(sum(middle_salaries) / len(middle_salaries)) if middle_salaries else 0
+        avg_vacancy_salary[programming_language] = {
+            'average_salary': avg_salary,
+            'vacancies_found': len(vacancies_sj),
+            'vacancies_processed': len(middle_salaries) if middle_salaries else 0,
+        }
 
     return avg_vacancy_salary
+
 
 def create_table(processed_information, title):
     table_data = [
