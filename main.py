@@ -103,13 +103,12 @@ def create_table(processed_information, source):
     table_data = [
         ['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']
     ]
-    information_keys = list(processed_information.keys())
-    for key in information_keys:
-        try:
-            data = [key, processed_information[key]['vacancies_found'], processed_information[key]['vacancies_processed'], processed_information[key]['average_salary']]
-        except:
-            data = [key, processed_information[key]['vacancies_found'], 0, 0]
-        table_data.append(data)
+    for language, stats in processed_information.items():
+        vacancies_found = stats.get('vacancies_found', 0)
+        vacancies_processed = stats.get('vacancies_processed', 0)
+        average_salary = stats.get('average_salary', 0)
+        
+        table_data.append([language, vacancies_found, vacancies_processed, average_salary])
     table = terminaltables.AsciiTable(table_data)
     if source == 'sj':
         table.title = 'SuperJob Moscow'
