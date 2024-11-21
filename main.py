@@ -64,44 +64,67 @@ def predict_rub_salary_hh(programming_languages):
 
 def predict_rub_salary_sj(token, programming_languages):
     avg_vacancy_salary = {}
+
     for programming_language in programming_languages:
         avg_vacancy_salary[programming_language] = {}
-        url = 'https://api.superjob.ru/2.0/vacancies'
+
+        superjob_url = 'https://api.superjob.ru/2.0/vacancies'
         headers = {
             'X-Api-App-Id': token
         }
+
         params = {
             'keyword': f'Программист {programming_language}',
             'town': DEFAULT_CITY,
-            'count': 500
+            'count': 100
         }
-        response = requests.get(url, headers=headers, params=params)
-        response.raise_for_status()
-        response = response.json()
-        response_objects = response.get('objects')
+
+        vacancies_sj = []
+
+        for page in count(0):
+            params['page'] = page
+            try:
+                response = requests.get(superjob_url, headers=headers, params=params, timeout=60)
+                response.raise_for_status()
+                response = response.json()
+            except requests.exceptions.HTTPError as ex:
+                if response.status_code == 400:
+                    print(f"Bad request occurred. Exiting pagination loop for {programming_language}.")
+                    break
+                else:
+                    raise ex
+
+            response_objects = response.get('objects', [])
+            vacancies_sj.extend(response_objects)
+
+            if not response.get('more'):
+                break
+
         middle_salaries = []
-        for vacancy in response_objects:
+        for vacancy in vacancies_sj:
             if not vacancy:
                 continue
             middle_salary = int(predict_salary_sj(vacancy['payment_from'], vacancy['payment_to']))
             if middle_salary:
                 middle_salaries.append(middle_salary)
+                
         if middle_salaries:
-            try: 
+            try:
                 avg_salary = int(sum(middle_salaries) / len(middle_salaries))
             except ZeroDivisionError:
                 avg_salary = None
+
             avg_vacancy_salary[programming_language] = {
                 'average_salary': avg_salary,
-                'vacancies_found': response['total'],
+                'vacancies_found': len(vacancies_sj),
                 'vacancies_processed': len(middle_salaries),
             }
         else:
             avg_vacancy_salary[programming_language] = {
-                'vacancies_found': response['total']
+                'vacancies_found': len(vacancies_sj)
             }
-    return avg_vacancy_salary
 
+    return avg_vacancy_salary
 
 def create_table(processed_information, title):
     table_data = [
