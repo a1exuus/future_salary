@@ -6,6 +6,10 @@ import terminaltables
 from itertools import count
 
 
+DEFAULT_AREA_ID = 1
+DEFAULT_CITY = 'Москва'
+
+
 def calculate_salary(salary_from, salary_to):
     if not salary_from:
         middle_salary = salary_to * 0.8
@@ -36,7 +40,7 @@ def predict_rub_salary_hh(programming_languages):
         middle_salaries = []
         params = {
             'text': f'Программист {programming_language}',
-            'area': 1
+            'area': DEFAULT_AREA_ID
         }
         for page in count(0):
             sleep(1)
@@ -68,7 +72,7 @@ def predict_rub_salary_sj(token, programming_languages):
         }
         params = {
             'keyword': f'Программист {programming_language}',
-            'town': 'Москва',
+            'town': DEFAULT_CITY,
             'count': 500
         }
         response = requests.get(url, headers=headers, params=params)
