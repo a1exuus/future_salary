@@ -99,7 +99,7 @@ def predict_rub_salary_sj(token, programming_languages):
     return avg_vacancy_salary
 
 
-def create_table(processed_information, source):
+def create_table(processed_information, title):
     table_data = [
         ['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']
     ]
@@ -109,11 +109,9 @@ def create_table(processed_information, source):
         average_salary = stats.get('average_salary', 0)
         
         table_data.append([language, vacancies_found, vacancies_processed, average_salary])
+
     table = terminaltables.AsciiTable(table_data)
-    if source == 'sj':
-        table.title = 'SuperJob Moscow'
-    else:
-        table.title = 'HeadHunter Moscow'
+    table.title = title
     return table.table
 
 
