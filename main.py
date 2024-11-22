@@ -128,5 +128,5 @@ if __name__ == '__main__':
     load_dotenv()
     token = os.getenv('SJ_SECRET_KEY')
     programming_languages = ['Python', 'Java', 'C++', 'JavaScript']
-    # print(create_table(predict_rub_salary_hh(programming_languages), 'hh'))
+    print(create_table(predict_rub_salary_hh(programming_languages), 'hh'))
     print(create_table(predict_rub_salary_sj(token, programming_languages), 'sj'))
