@@ -87,7 +87,6 @@ def predict_rub_salary_sj(token, programming_languages):
                     break
                 else:
                     raise ex
-
             vacancies_sj.extend(response.get('objects', []))
             if not response.get('more'):
                 break
@@ -99,7 +98,7 @@ def predict_rub_salary_sj(token, programming_languages):
         avg_salary = int(sum(middle_salaries) / len(middle_salaries)) if middle_salaries else 0
         avg_vacancy_salary[programming_language] = {
             'average_salary': avg_salary,
-            'vacancies_found': len(vacancies_sj),
+            'vacancies_found': response['total'],
             'vacancies_processed': len(middle_salaries) if middle_salaries else 0,
         }
 
