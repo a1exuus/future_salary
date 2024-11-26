@@ -91,13 +91,11 @@ def predict_rub_salary_sj(token, programming_languages):
             vacancies_sj.extend(response.get('objects', []))
             if not response.get('more'):
                 break
-
-        middle_salaries = [
-            int(predict_salary_sj(vacancy['payment_from'], vacancy['payment_to']))
-            for vacancy in vacancies_sj
-            if vacancy and predict_salary_sj(vacancy['payment_from'], vacancy['payment_to'])
-        ]
-
+        middle_salaries = []
+        for vacancy in vacancies_sj:
+            salary = predict_salary_sj(vacancy['payment_from'], vacancy['payment_to'])
+            if vacancy and salary:
+                middle_salaries.append(salary)
         avg_salary = int(sum(middle_salaries) / len(middle_salaries)) if middle_salaries else 0
         avg_vacancy_salary[programming_language] = {
             'average_salary': avg_salary,
@@ -128,5 +126,5 @@ if __name__ == '__main__':
     load_dotenv()
     token = os.getenv('SJ_SECRET_KEY')
     programming_languages = ['Python', 'Java', 'C++', 'JavaScript']
-    print(create_table(predict_rub_salary_hh(programming_languages), 'hh'))
-    print(create_table(predict_rub_salary_sj(token, programming_languages), 'sj'))
+    # print(create_table(predict_rub_salary_hh(programming_languages), 'HeadhHunter Moscow'))
+    print(create_table(predict_rub_salary_sj(token, programming_languages), 'SuperJob Moscow'))
